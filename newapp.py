@@ -1,6 +1,5 @@
 import streamlit as st
 import os
-from dotenv import load_dotenv
 
 from langchain_community.vectorstores import FAISS
 from langchain_openai import OpenAIEmbeddings
@@ -8,16 +7,8 @@ from langchain_groq import ChatGroq
 from langchain.chains import RetrievalQA
 
 # --------------------------------------
-# Setup & Configuration
+# Streamlit Configuration
 # --------------------------------------
-
-def load_env():
-    load_dotenv()
-    api_key = os.getenv("GROQ_API_KEY")
-    if not api_key:
-        st.error("Missing GROQ_API_KEY in your .env file.")
-        st.stop()
-    return api_key
 
 def configure_streamlit():
     st.set_page_config(page_title="📚 BigData Chatbot", layout="wide")
@@ -32,7 +23,7 @@ def load_vectorstore(index_path: str):
     if not os.path.exists(index_path):
         st.error(f"Index not found at `{index_path}`. Please run the indexing step first.")
         st.stop()
-    
+
     embeddings = OpenAIEmbeddings()
     vectorstore = FAISS.load_local(
         index_path,
@@ -71,7 +62,13 @@ def run_qa_interface(retriever, llm):
 
 def main():
     configure_streamlit()
-    groq_api_key = load_env()
+
+    st.sidebar.header("🔐 API Configuration")
+    groq_api_key = st.sidebar.text_input("Enter your Groq API Key:", type="password")
+
+    if not groq_api_key:
+        st.warning("Please enter your Groq API Key to continue.")
+        st.stop()
 
     INDEX_PATH = "my_faiss_index"
 
