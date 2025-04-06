@@ -1,1 +1,1 @@
-# newapp
+Big Data Engineering app based on documents. Created Strealit app.
